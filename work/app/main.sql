@@ -6,9 +6,5 @@ CREATE TABLE form (
     PRIMARY KEY (id)
 );
 
-INSERT INTO form (lastname) VALUES ('komori');
-INSERT INTO form (lastname) VALUES ('koutaro');
-INSERT INTO form (lastname) VALUES ('kouki');
-
 SELECT * FROM form;
     

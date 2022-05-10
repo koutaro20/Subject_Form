@@ -22,11 +22,30 @@ try {
     exit;
 }
 
+function confirmPersonal($pdo)
+{
+    $lastName = trim(filter_input(INPUT_POST, 'lastName'));
+    $firstName = trim(filter_input(INPUT_POST, 'firstName'));
+    $mail = trim(filter_input(INPUT_POST, 'mail'));
+
+    $stmt = $pdo->prepare("INSERT INTO form (lastname, firstname, mailaddress) VALUES (:last, :first, :mail)");
+    $stmt->bindValue('last', $lastName, PDO::PARAM_STR);
+    $stmt->bindValue('first', $firstName, PDO::PARAM_STR);
+    $stmt->bindValue('mail', $mail, PDO::PARAM_STR);
+    $stmt->execute();
+}
+
 function getPersonal($pdo)
 {
     $stmt = $pdo->query("SELECT * FROM form ORDER BY id ASC");
     $personals = $stmt->fetchAll();
     return $personals;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['type']) && $_POST['type'] === '1') {
+        confirmPersonal($pdo);
+    }
 }
 
 $personals = getPersonal($pdo);
@@ -43,7 +62,7 @@ $personals = getPersonal($pdo);
 </head>
 <body>
     <!-- input -->
-    <form action="index.php" method="POST" class="col-md-6 offset-md-3">
+    <form action="" method="POST" class="col-md-6 offset-md-3">
         <div class="row">
             <div class="col-sm">
                 <input type="text" class="form-control" name="lastName" placeholder="姓" aria-label="姓">
@@ -57,13 +76,15 @@ $personals = getPersonal($pdo);
                 <input type="text" class="form-control" name="mail" placeholder="メールアドレス">
             </div>
         </div>
+
+        <input type="hidden" name="type" value="1">
         <div class="d-grid gap-2 col-3 mx-auto">
-            <button type="button" class="btn btn-info">確認する</button>
+            <button type="submit" class="btn btn-info" name="btn-submit">確認する</button>
         </div>
     </form>
 
     <!-- confirm -->
-    <form action="index.php" method="POST" class="col-md-6 offset-md-3">
+    <form action="" method="POST" class="col-md-6 offset-md-3">
         <div class="row">
             <div class="col-sm">
                 <input type="text" class="form-control" name="lastName" placeholder="姓" aria-label="姓">
@@ -77,9 +98,11 @@ $personals = getPersonal($pdo);
                 <input type="text" class="form-control" name="mail" placeholder="メールアドレス">
             </div>
         </div>
+
+        <input type="hidden" name="type" value="2">
         <div class="d-grid gap-2 col-3 mx-auto">
             <button type="button" class="btn btn-info">戻る</button>
-            <button type="button" class="btn btn-info">送信する</button>
+            <button type="submit" class="btn btn-info">送信する</button>
         </div>
     </form>
 
