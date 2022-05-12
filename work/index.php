@@ -22,7 +22,7 @@ try {
     exit;
 }
 
-function confirmPersonal($pdo)
+function submitPersonal($pdo)
 {
     $lastName = trim(filter_input(INPUT_POST, 'lastName'));
     $firstName = trim(filter_input(INPUT_POST, 'firstName'));
@@ -43,9 +43,7 @@ function getPersonal($pdo)
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['type']) && $_POST['type'] === '1') {
-        confirmPersonal($pdo);
-    }
+    submitPersonal($pdo);
 }
 
 $personals = getPersonal($pdo);
@@ -58,6 +56,7 @@ $personals = getPersonal($pdo);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="public/css/styles.css">
     <title>SubjectForm</title>
 </head>
 <body>
@@ -77,35 +76,10 @@ $personals = getPersonal($pdo);
             </div>
         </div>
 
-        <input type="hidden" name="type" value="1">
         <div class="d-grid gap-2 col-3 mx-auto">
-            <button type="submit" class="btn btn-info" name="btn-submit">確認する</button>
+            <button type="submit" class="btn btn-info" name="btn-submit">送信する</button>
         </div>
     </form>
-
-    <!-- confirm -->
-    <form action="" method="POST" class="col-md-6 offset-md-3">
-        <div class="row">
-            <div class="col-sm">
-                <input type="text" class="form-control" name="lastName" placeholder="姓" aria-label="姓">
-            </div>
-            <div class="col-sm">
-                <input type="text" class="form-control" name="firstName" placeholder="名" aria-label="名">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm">
-                <input type="text" class="form-control" name="mail" placeholder="メールアドレス">
-            </div>
-        </div>
-
-        <input type="hidden" name="type" value="2">
-        <div class="d-grid gap-2 col-3 mx-auto">
-            <button type="button" class="btn btn-info">戻る</button>
-            <button type="submit" class="btn btn-info">送信する</button>
-        </div>
-    </form>
-
     <!-- result -->
     <table class="table">
         <thead>
