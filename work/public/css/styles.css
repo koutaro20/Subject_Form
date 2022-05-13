@@ -1,4 +1,14 @@
-/* a {
+body
+.form {
+    min-height: 100vh;
+}
+
+.mail-margin {
+    margin-top: 2px;
+}
+
+.add {
     text-decoration: none;
     color: #333;
-} */
+}
+

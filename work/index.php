@@ -1,49 +1,18 @@
 <?php
 
-require 'public/function/functions.php';
+require_once(__DIR__ . '/./app/config.php');
 
-define('DSN', 'mysql:host=db;dbname=form-contents;charset=utf8mb4');
-define('DB_USER', 'user');
-define('DB_PASS', 'userpass');
-
-try {
-    $pdo = new PDO(
-        DSN,
-        DB_USER,
-        DB_PASS,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]
-    );
-} catch (PDOException $e) {
-    echo $e->getMessage();
-    exit;
-}
-
-function submitPersonal($pdo)
-{
-    $lastName = trim(filter_input(INPUT_POST, 'lastName'));
-    $firstName = trim(filter_input(INPUT_POST, 'firstName'));
-    $mail = trim(filter_input(INPUT_POST, 'mail'));
-
-    $stmt = $pdo->prepare("INSERT INTO form (lastname, firstname, mailaddress) VALUES (:last, :first, :mail)");
-    $stmt->bindValue('last', $lastName, PDO::PARAM_STR);
-    $stmt->bindValue('first', $firstName, PDO::PARAM_STR);
-    $stmt->bindValue('mail', $mail, PDO::PARAM_STR);
-    $stmt->execute();
-}
-
-function getPersonal($pdo)
-{
-    $stmt = $pdo->query("SELECT * FROM form ORDER BY id ASC");
-    $personals = $stmt->fetchAll();
-    return $personals;
-}
+$pdo = getPdoInstance();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validateToken();
     submitPersonal($pdo);
+}
+
+$pageFlag = 0;
+
+if(!empty($_POST['btn-submit'])){
+    $pageFlag = 1;
 }
 
 $personals = getPersonal($pdo);
@@ -61,26 +30,33 @@ $personals = getPersonal($pdo);
 </head>
 <body>
     <!-- input -->
-    <form action="" method="POST" class="col-md-6 offset-md-3">
-        <div class="row">
-            <div class="col-sm">
-                <input type="text" class="form-control" name="lastName" placeholder="姓" aria-label="姓">
+    <?php if ($pageFlag === 0) :?>
+    <div class="d-flex justify-content-center align-items-center form">
+        <form action="" method="POST" class="col-md-6 offset-md-3 mx-auto">
+            <div class="row">
+                <div class="col-sm">
+                    <input type="text" class="form-control" name="lastName" placeholder="姓" aria-label="姓">
+                </div>
+                <div class="col-sm">
+                    <input type="text" class="form-control" name="firstName" placeholder="名" aria-label="名">
+                </div>
             </div>
-            <div class="col-sm">
-                <input type="text" class="form-control" name="firstName" placeholder="名" aria-label="名">
+            <div class="row mail-margin">
+                <div class="col-sm">
+                    <input type="text" class="form-control" name="mail" placeholder="メールアドレス">
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm">
-                <input type="text" class="form-control" name="mail" placeholder="メールアドレス">
+    
+            <input type="hidden" name="token" value="<?= h($_SESSION['token']); ?>">
+            <div class="d-grid gap-2 col-3 mx-auto">
+                <button type="submit" class="btn btn-info" name="btn-submit" value="送信する">送信する</button>
             </div>
-        </div>
+        </form>
+    </div>
+    <?php endif; ?>
 
-        <div class="d-grid gap-2 col-3 mx-auto">
-            <button type="submit" class="btn btn-info" name="btn-submit">送信する</button>
-        </div>
-    </form>
     <!-- result -->
+    <?php if ($pageFlag === 1) : ?>
     <table class="table">
         <thead>
             <tr>
@@ -91,7 +67,6 @@ $personals = getPersonal($pdo);
             </tr>
         </thead>
         <tbody>
-            <!-- php foreach回す -->
             <?php foreach ($personals as $personal): ?>
                 <tr>
                     <th scope="row"><?= h($personal->id); ?></th>
@@ -100,46 +75,13 @@ $personals = getPersonal($pdo);
                     <td><?= h($personal->mailaddress); ?></td>
                 </tr>
             <?php endforeach; ?>
-        
         </tbody>
     </table>
     <div class="d-grid gap-2 col-3 mx-auto">
-        <!-- aタグで遷移させるinput.phpに -->
-        <button type="button" class="btn btn-info">追加する</button>
+        <button type="button" class="btn btn-info"><a href="" class="add">追加する</a></button>
     </div>
+    <?php endif; ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
